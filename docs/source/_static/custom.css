@@ -1,0 +1,143 @@
+/* ================================
+   Notebook output styling (if needed)
+   ================================ */
+div.output {
+  background-color: #CFD6DC !important;
+  color: #000     !important;
+  border: 1px solid #ddd !important;
+  padding: 10px   !important;
+  border-radius: 5px !important;
+}
+div.output_area pre {
+  background-color: #CFD6DC !important;
+  color: #333     !important;
+  padding: 10px   !important;
+  border-radius: 5px !important;
+  border: 1px solid #ccc !important;
+}
+
+/* ======================================================
+   Prevent the theme from filtering or inverting your PNG
+   ====================================================== */
+.mTopic-logo-container img,
+.mTopic-logo-container .logo-light,
+.mTopic-logo-container .logo-dark,
+.logo__image,
+.logo__image.only-light,
+.logo__image.only-dark {
+  filter: none !important;
+  -webkit-filter: none !important;
+  mix-blend-mode: normal !important;
+  background-blend-mode: normal !important;
+  opacity: 1 !important;
+}
+
+/* ================================
+   Logo container & light/dark swap
+   ================================ */
+.mTopic-logo-container {
+  text-align: center;
+  margin: 2rem auto;
+  width: 75%;
+  max-width: 600px;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.mTopic-logo-container .logo-light,
+.mTopic-logo-container .logo-dark {
+  display: none !important;
+  width: 100% !important;
+  height: auto !important;
+}
+html:not([data-theme="dark"]) .mTopic-logo-container .logo-light {
+  display: block !important;
+}
+html[data-theme="dark"] .mTopic-logo-container .logo-dark {
+  display: block !important;
+}
+
+/* ================================
+   Strip out the built-in hero/banner
+   ================================ */
+.sb-hero,
+.sb-hero__content,
+.bd-hero,
+.bd-hero__banner,
+.bd-hero__content,
+.hero-banner {
+  display: none !important;
+}
+
+/* If the first section wrapper still shows, kill it */
+#single-cell-multimodal-topic-modeling,
+#single-cell-multimodal-topic-modeling > div {
+  background: transparent !important;
+  border: none           !important;
+  box-shadow: none       !important;
+  padding: 0             !important;
+  margin: 0 auto         !important;
+}
+
+/* ================================
+   Dark‐mode: force page & outputs to #121212
+   ================================ */
+html[data-theme="dark"]  body,
+html[data-theme="dark"]  .bd-content,
+html[data-theme="dark"]  .bd-article-container,
+html[data-theme="dark"]  #single-cell-multimodal-topic-modeling,
+html[data-theme="dark"]  div.output,
+html[data-bs-theme="dark"] body,
+html[data-bs-theme="dark"] .bd-content,
+html[data-bs-theme="dark"] .bd-article-container,
+html[data-bs-theme="dark"] #single-cell-multimodal-topic-modeling,
+html[data-bs-theme="dark"] div.output {
+  background-color: #121212 !important;
+  border-color: #121212   !important;
+}
+
+/* ======================================================
+   Remove header bottom border & shadow (hairline on scroll)
+   ====================================================== */
+header.bd-header,
+.bd-header.navbar,
+.bd-navbar {
+  border-bottom: none !important;
+  box-shadow: none     !important;
+}
+
+/* =============================================================
+   Nuke every header/article border & shadow that might flicker
+   ============================================================= */
+/* Main navbar/header */
+header.bd-header,
+.bd-header.navbar,
+.bd-navbar,
+.navbar,
+.navbar-expand-lg {
+  border: none      !important;
+  box-shadow: none  !important;
+}
+
+/* The article’s own header banner */
+.bd-header-article,
+.bd-header-article.d-print-none {
+  border: none      !important;
+  box-shadow: none  !important;
+}
+
+/* Sticky states (if the theme toggles a “stuck” or “sticky” class) */
+.sb-hero.is-stuck,
+.sb-hero.stuck,
+header.bd-header.is-stuck,
+header.bd-header.sticky {
+  border: none      !important;
+  box-shadow: none  !important;
+}
+
+/* Remove any generated ::after lines */
+header.bd-header::after,
+.bd-header-article::after {
+  content: none     !important;
+}
