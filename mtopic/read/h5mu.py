@@ -27,11 +27,7 @@ def h5mu(path):
 
             # Load the MuData object
             mdata = mtopic.read.h5mu("path/to/file.h5mu")
-
-    :notes:
-        - The `.h5mu` format is optimized for multimodal data, such as single-cell RNA-seq combined with 
-          protein expression or ATAC-seq. It supports integrated analyses and visualizations.
-        - Verify the file path to avoid errors during loading.
+            
     """
     
     return muon.read_h5mu(path)

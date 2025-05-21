@@ -12,15 +12,15 @@ def filter_topics(model,
                   transparent=False, 
                   save=None):
     """
-    Visualize the significance of topics based on their maximum proportion across cells.
+    Visualize the significance of topics based on their maximum probability across cells.
 
-    This function generates a scatter plot to show the maximum normalized proportion of each topic across all cells. 
-    Topics with higher maximum proportions represent significant patterns in the dataset, while topics with low 
-    maximum proportions might be less informative or represent noise. The plot includes a suggested threshold line 
+    This function generates a scatter plot to show the maximum probability of each topic across all cells. 
+    Topics with higher maximum probabilities represent significant patterns in the dataset, while topics with low 
+    maximum probabilities might be less informative or represent noise. The plot includes a suggested threshold line 
     (default at y=0.01) to help identify insignificant topics for filtering in downstream analysis.
 
     :param model: 
-        An instance of the topic model (e.g., `mtopic.tl.MTM` or `mtopic.tl.sMTM`) containing the topic proportions (`gamma`) to analyze.
+        An instance of the topic model (e.g., `mtopic.tl.MTM` or `mtopic.tl.sMTM`) containing the topic distributions (`gamma`) to analyze.
     :type model: mtopic.tl.MTM or mtopic.tl.sMTM
     :param s: 
         Marker size for the scatter plot. Default is 50.
@@ -65,7 +65,7 @@ def filter_topics(model,
     x = [i for i in range(model.n_topics)]
     y = max_proportions.values
     ax.scatter(x=x, y=y, edgecolor='none', s=s, c='#990000')
-    ax.set(ylim=[0, 1.02], xticks=[], ylabel='Maximum proportion of a topic across cells', xlabel='Topics', xlim=[-0.02*(model.n_topics-1), 1.02*(model.n_topics-1)])
+    ax.set(ylim=[0, 1.02], xticks=[], ylabel='Maximum probability of a topic across cells', xlabel='Topics', xlim=[-0.02*(model.n_topics-1), 1.02*(model.n_topics-1)])
     ax.grid(axis='y', alpha=0.5)
     ax.tick_params(axis='both', which='major', labelsize=fontsize)
 

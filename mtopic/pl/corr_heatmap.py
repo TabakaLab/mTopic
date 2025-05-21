@@ -16,7 +16,7 @@ def corr_heatmap(arr1,
     Visualize the correlation matrix between two sets of features as a heatmap.
 
     This function computes and plots a correlation heatmap to visualize the relationships between two 
-    sets of features. Each set is represented as a pandas DataFrame, with columns as features. The color 
+    sets of features. Each set is represented as a `pandas.DataFrame`, with columns as features. The color 
     intensity in the heatmap indicates the strength and direction of the correlation.
 
     :param arr1: 

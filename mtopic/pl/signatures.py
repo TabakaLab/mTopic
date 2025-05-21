@@ -13,20 +13,20 @@ def signatures(mdata,
                transparent=False,
                save=None):
     """
-    Visualize the top features (signatures) for each topic in a specified modality of a MuData object.
+    Visualize the feature signatures for each topic in a specified modality of a MuData object.
 
     This function generates bar plots displaying the top `n_top` features associated with each topic 
-    in a specified modality of a `MuData` object. Features are ranked by their importance in the topic, 
+    in a specified modality of a `MuData` object. Features are ranked by their score, 
     providing insight into the key contributors for each topic. The plots are arranged in a grid layout for easy comparison.
 
     :param mdata: 
-        A `MuData` object containing multimodal single-cell data with topic-feature distributions stored in `varm`.
+        A `MuData` object containing multimodal single-cell data with feature-topic distributions stored in `varm`.
     :type mdata: muon.MuData
     :param mod: 
         The modality to visualize topic signatures for (e.g., 'rna', 'protein').
     :type mod: str
     :param signatures: 
-        Key in the `varm` attribute of the specified modality representing the topic-feature distributions to plot. 
+        Key in the `varm` attribute of the specified modality representing the feature-topic distributions to plot. 
         Default is 'signatures'.
     :type signatures: str, optional
     :param n_top: 

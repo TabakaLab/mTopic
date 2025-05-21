@@ -42,22 +42,22 @@ def dominant_topics(mdata,
                     transparent=False, 
                     save=None):
     """
-    Visualize the dominant topic for each sample in a MuData object.
+    Visualize the dominant topic for each cell/spot in a MuData object.
 
-    This function creates a scatter plot where each point represents a sample, colored according to the 
-    dominant topic (i.e., the topic with the highest proportion) for that sample. The plot provides an 
+    This function creates a scatter plot where each point represents a cell/spot, colored according to the 
+    dominant topic (i.e., the topic with the highest probability) for that sample. The plot provides an 
     intuitive overview of how topics are distributed spatially or in a given embedding. A legend maps 
     colors to topics for easy interpretation.
 
     :param mdata: 
-        A `MuData` object containing multimodal single-cell data with topic proportions stored in `obsm`.
+        A `MuData` object containing multimodal single-cell data with topic distributions stored in `obsm`.
     :type mdata: muon.MuData
     :param x: 
         The key in `obsm` of `mdata` representing the spatial coordinates or embeddings to use for plotting 
         (e.g., 'coords', 'umap').
     :type x: str
     :param topics: 
-        The key in `obsm` of `mdata` representing the topic proportions. Default is 'topics'.
+        The key in `obsm` of `mdata` representing the topic distribution. Default is 'topics'.
     :type topics: str, optional
     :param palette: 
         A dictionary mapping topics to specific colors. If None, a default palette of unique hex colors is generated. 

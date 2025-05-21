@@ -18,17 +18,17 @@ def scatter_pie(mdata,
                 transparent=False, 
                 save=None):
     """
-    Create a scatter plot with pie charts representing topic proportions at each sample coordinate.
+    Create a scatter plot with pie charts representing topic distributions at each cell/spot coordinate.
 
-    This function visualizes topic proportions for each sample in a dataset using pie charts positioned 
+    This function visualizes topic distributions for each sample in a dataset using pie charts positioned 
     at their corresponding spatial or embedding coordinates. Each pie chart represents the distribution 
-    of topics for a single sample, and a legend provides the color mapping for each topic.
+    of topics for a single cell/spot, and a legend provides the color mapping for each topic.
 
     :param mdata: 
-        A `MuData` object containing multimodal single-cell data, including topic proportions and coordinates.
+        A `MuData` object containing multimodal single-cell data, including topic distributions and coordinates.
     :type mdata: muon.MuData
     :param topics: 
-        The key in `obsm` of `mdata` representing the topic proportions. Default is 'topics'.
+        The key in `obsm` of `mdata` representing the topic distributions. Default is 'topics'.
     :type topics: str, optional
     :param x: 
         The key in `obsm` of `mdata` representing the spatial coordinates or embeddings for plotting that is a pandas.DataFrame. Default is 'coords'.
@@ -74,7 +74,7 @@ def scatter_pie(mdata,
             # Load MuData object
             mdata = mtopic.read.h5mu("path/to/file.h5mu")
 
-            # Plot scatter pie charts of topic proportions
+            # Plot scatter pie charts of topic distributions
             mtopic.pl.scatter_pie(
                 mdata, 
                 topics='topics', 

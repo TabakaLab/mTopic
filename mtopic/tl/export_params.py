@@ -8,14 +8,14 @@ def export_params(model,
                   filter_threshold=0.01, 
                   normalize=True):
     """
-    Export model parameters (gamma and lambda) to a MuData object and filter insignificant topics.
+    Export topic-cell and feature-topic distributions to a MuData object and filter insignificant topics.
 
-    This function exports topic proportions (gamma) and topic-feature distributions (lambda) from the given model 
+    This function exports topic-cell distributions (`gamma`) and feature-topic distributions (`lambda`) from the given model 
     into the `obsm` and `varm` attributes of a `MuData` object. Users can apply optional filtering to remove 
-    topics with proportions below a specified threshold, which helps focus on meaningful patterns.
+    topics with probabilities below a specified threshold, which helps focus on meaningful patterns.
 
     :param model: 
-        An instance of `mtopic.tl.MTM` or `mtopic.tl.spatialMTM` containing the parameters (`gamma` and `lambda`) 
+        An instance of `mtopic.tl.MTM` or `mtopic.tl.spatialMTM` containing the parameters (`gamma` and `lambda_`) 
         to be exported.
     :type model: mtopic.tl.MTM or mtopic.tl.spatialMTM
     :param mdata: 
@@ -26,15 +26,15 @@ def export_params(model,
         If None, no prefix is added. Default is None.
     :type prefix: str, optional
     :param filter_topics: 
-        Whether to filter topics based on their maximum normalized proportion across cells. If True, only topics 
-        with a maximum proportion above `filter_threshold` are retained. Default is True.
+        Whether to filter topics based on their maximum probability across cells. If True, only topics 
+        with a maximum probability above `filter_threshold` are retained. Default is True.
     :type filter_topics: bool, optional
     :param filter_threshold: 
-        The threshold for filtering topics when `filter_topics` is True. Topics with a maximum normalized 
-        proportion below this threshold are removed. Default is 0.01.
+        The threshold for filtering topics when `filter_topics` is True. Topics with a maximum
+        probability below this threshold are removed. Default is 0.01.
     :type filter_threshold: float, optional
     :param normalize: 
-        Whether to normalize the topic proportions (`gamma`). If True, normalizes rows of `gamma` so that 
+        Whether to normalize the topic-cell distributions (`gamma`). If True, normalizes rows of `gamma` so that 
         each row sums to 1. Default is True.
     :type normalize: bool, optional
 
@@ -42,8 +42,8 @@ def export_params(model,
         None
 
     :updates:
-        - `mdata.obsm['{prefix}_topics']`: A DataFrame containing topic proportions for each sample, optionally filtered.
-        - `mdata[modality].varm['{prefix}_signatures']`: A DataFrame containing topic-feature distributions for 
+        - `mdata.obsm['{prefix}_topics']`: A DataFrame containing topic-cell distributions for each cell/spot, optionally filtered.
+        - `mdata[modality].varm['{prefix}_signatures']`: A DataFrame containing feature-topic distributions for 
           each modality, filtered to include only selected topics.
 
     :example:
@@ -65,13 +65,13 @@ def export_params(model,
             mtopic.pp.export_params(model, mdata)
 
             # Access exported parameters
-            print(mdata.obsm['topics'])  # Topic proportions
-            print(mdata['rna'].varm['signatures'])  # Topic-feature distributions for 'rna' modality
+            print(mdata.obsm['topics'])  # Topic-cell distributions
+            print(mdata['rna'].varm['signatures'])  # Feature-topic distributions for 'rna' modality
 
     :notes:
-        - **Gamma (Topic Proportions)**: Stored in `obsm` as `{prefix}_topics`. Each row corresponds to a sample, 
+        - **Gamma (Topic-cell distributions)**: Stored in `obsm` as `{prefix}_topics`. Each row corresponds to a sample, 
           and each column represents a topic.
-        - **Lambda (Topic-Feature Distributions)**: Stored in `varm` for each modality as `{prefix}_signatures`. 
+        - **Lambda (Feature-topic distributions)**: Stored in `varm` for each modality as `{prefix}_signatures`. 
           Each column corresponds to a topic, and each row represents a feature.
         - If `prefix` is None, parameters are stored with keys `'topics'` and `'signatures'`.
     """

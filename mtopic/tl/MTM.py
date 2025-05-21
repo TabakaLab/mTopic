@@ -38,7 +38,7 @@ def _e_step(X,
     phi_norm = dict()
     for m in modalities:
         phi_norm[m] = np.zeros(N[m])
-    # Initialize topic proportions
+    # Initialize topic distributions
     gamma = np.ones((D, K))
 
     # Find gamma for each document d
@@ -54,7 +54,7 @@ def _e_step(X,
             counts_d[m] = X[m][d][:, idx_d[m]].toarray().flatten()
             exp_E_log_beta_d[m] = exp_E_log_beta[m][:, idx_d[m]]
 
-        # Find topic proportions gamma
+        # Find topic distributions gamma
         for _ in range(max_iter_d):
             prev_gamma = gamma_d
 
@@ -71,7 +71,7 @@ def _e_step(X,
             if (meanchange < conv_threshold):
                 break
 
-        # Save converged topic proportions
+        # Save converged topic distributions
         gamma[d, :] = gamma_d
 
         for m in modalities:
@@ -130,9 +130,9 @@ class MTM:
     :vartype n_var: dict
     :ivar eta: Prior for topics.
     :vartype eta: float
-    :ivar alpha: Prior for topic proportions.
+    :ivar alpha: Prior for topic distributions.
     :vartype alpha: float
-    :ivar gamma: Variational parameters for topic proportions.
+    :ivar gamma: Variational parameters for topic distributions.
     :vartype gamma: numpy.ndarray
     :ivar lambda_: Variational parameters for topics.
     :vartype lambda_: dict

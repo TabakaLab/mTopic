@@ -64,7 +64,7 @@ def _spatial_e_step(X,
     phi_norm = dict()
     for m in modalities:
         phi_norm[m] = np.zeros(N[m])
-    # Initialize topic proportions
+    # Initialize topic distributions
     gamma = np.ones((D, K))
     sim = np.zeros((D, K))
 
@@ -81,7 +81,7 @@ def _spatial_e_step(X,
             counts_d[m] = X[m][d][:, idx_d[m]].toarray().flatten()
             exp_E_log_beta_d[m] = exp_E_log_beta[m][:, idx_d[m]]
 
-        # Find topic proportions gamma
+        # Find topic distributions gamma
         for _ in range(max_iter_d):
             prev_gamma = gamma_d
 
@@ -107,7 +107,7 @@ def _spatial_e_step(X,
 
         exp_E_log_theta_d = _dirichlet_exp_E_log_prior(gamma_d)
 
-        # Save converged topic proportions
+        # Save converged topic distributions
         gamma[d, :] = gamma_d
         
         sim[d, :] = exp_E_log_sim
@@ -190,7 +190,7 @@ class sMTM():
     :vartype neighborhood_dist: numpy.ndarray
     :ivar neighborhood_graph: Indices of neighbors for each sample.
     :vartype neighborhood_graph: numpy.ndarray
-    :ivar gamma: Variational parameters for topic proportions.
+    :ivar gamma: Variational parameters for topic distributions.
     :vartype gamma: numpy.ndarray
     :ivar lambda_: Variational parameters for topics across modalities.
     :vartype lambda_: dict
@@ -289,9 +289,9 @@ class sMTM():
     def _init_params(self):
         # Topic prior
         self.eta = 0.01
-        # Topic proportions prior
+        # Topic distributions prior
         self.alpha = 1 / self.n_topics
-        # Initialize variational topic proportions
+        # Initialize variational topic distributions
         self.gamma = np.ones((self.D, self.n_topics)) * self.alpha
         # Initiate variational topics
         self.lambda_ = dict()

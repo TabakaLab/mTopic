@@ -16,7 +16,7 @@ def filter_var_knee(path,
 
     This function identifies and removes overrepresented features (e.g., genes, proteins) across all topics in each 
     modality of a `MuData` object using a knee detection algorithm. Overrepresented features, which are beyond a 
-    significant drop-off point (knee point) in their cumulative activity, are filtered out to improve data quality 
+    significant drop-off point (knee point) in their cumulative feature score, are filtered out to improve data quality 
     and downstream analysis.
 
     :param path: 
@@ -55,7 +55,7 @@ def filter_var_knee(path,
 
     :notes:
         - **Feature Identification**:
-          Overrepresented features are identified by calculating their cumulative activity across all topics in a modality. 
+          Overrepresented features are identified by calculating their cumulative feature score across all topics in a modality. 
           The knee detection algorithm (`kneed`) detects the knee point, beyond which features are considered overrepresented.
         - **Knee Sensitivity**:
           The `knee_sensitivity` parameter can be set globally for all modalities or specified individually for each modality 
@@ -79,7 +79,7 @@ def filter_var_knee(path,
     # Loop through each modality in the MuData object
     for m in mdata.mod:
         if knee_sensitivity[m] > 0:
-            # Calculate cumulative activity of features across all topics
+            # Calculate cumulative feature score across topics
             sums = pd.DataFrame(model.lambda_[m], columns=model.features[m])
             sums = sums.div(sums.sum(axis=1), axis=0)
             sums = sums.sum(axis=0).sort_values(ascending=False)

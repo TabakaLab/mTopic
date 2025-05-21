@@ -11,17 +11,17 @@ def umap(mdata,
          seed=2291,
          n_jobs=10):
     """
-    Perform UMAP dimensionality reduction on topic proportions and store the results in the MuData object.
+    Perform UMAP dimensionality reduction on topic distributions.
 
     This function applies Uniform Manifold Approximation and Projection (UMAP) to reduce the dimensionality 
-    of topic proportions stored in the `obsm` attribute of a `MuData` object. The reduced dimensions are stored 
+    of topic distributions stored in the `obsm` attribute of a `MuData` object. The reduced dimensions are stored 
     in the `obsm` attribute under a specified name.
 
     :param mdata: 
-        A `MuData` object containing the topic proportions in the `obsm` attribute.
+        A `MuData` object containing the topic distributions in the `obsm` attribute.
     :type mdata: muon.MuData
     :param x: 
-        The key in the `obsm` attribute of `mdata` that holds the topic proportions to be used for UMAP. 
+        The key in the `obsm` attribute of `mdata` that holds the topic distributions to be used for UMAP. 
         Default is 'topics'.
     :type x: str, optional
     :param umap: 
@@ -61,7 +61,7 @@ def umap(mdata,
             # Load MuData object
             mdata = mtopic.read.h5mu("path/to/file.h5mu")
             
-            # Compute UMAP embedding for topic proportions
+            # Compute UMAP embedding for topic distributions
             mtopic.pp.umap(mdata, x='topics', n_components=2)
     """
 

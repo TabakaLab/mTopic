@@ -21,7 +21,7 @@ def filter_var_knee(model,
     Detect and visualize overrepresented features using a knee detection algorithm.
 
     This function identifies and visualizes features (e.g., genes) that are overrepresented across all topics 
-    in a specified modality of a topic model. By plotting the cumulative activity of features across topics, 
+    in a specified modality of a topic model. By plotting the cumulative feature scores across topics, 
     it applies a knee detection algorithm to find points of significant activity drop, which can be used 
     to filter out less informative features in downstream analysis.
 

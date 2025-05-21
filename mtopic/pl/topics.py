@@ -16,23 +16,23 @@ def topics(mdata,
            transparent=False,
            save=None):
     """
-    Visualize the spatial or embedding-based distribution of topic proportions in a MuData object.
+    Visualize topic distributions on spatial coordinates or embedding.
 
-    This function generates scatter plots to visualize the distribution of topic proportions across samples. 
+    This function generates scatter plots to visualize the topic distributions across cells/spots. 
     Each topic is displayed in a separate subplot, showing how the topic is spatially distributed or distributed 
     within a specified embedding. The plots are arranged in a grid for easy comparison.
 
     :param mdata: 
-        A `MuData` object containing multimodal single-cell data, with topic proportions stored in `obsm`.
+        A `MuData` object containing multimodal single-cell data, with topic distributions stored in `obsm`.
     :type mdata: muon.MuData
     :param x: 
         The key in `obsm` of `mdata` representing the spatial coordinates or embeddings to use for plotting (e.g., UMAP, PCA, or spatial coordinates).
     :type x: str
     :param topics: 
-        The key in `obsm` of `mdata` representing the topic proportions to plot. Default is 'topics'.
+        The key in `obsm` of `mdata` representing the topic distributions to plot. Default is 'topics'.
     :type topics: str, optional
     :param cmap: 
-        Colormap to use for visualizing topic proportions. Default is 'gnuplot'.
+        Colormap to use for visualizing topic distributions. Default is 'gnuplot'.
     :type cmap: str, optional
     :param marker: 
         Marker style for scatter plots. Default is '.'.

@@ -9,7 +9,7 @@ def feature_associations_data(mdata,
                               mod_list, 
                               normalize=True):
     """
-    Prepare topic signatures for training feature associations.
+    Prepare feature signatures for training feature associations.
 
     Extracts and optionally row-normalizes signature matrices from multiple modalities 
     in a MuData object. Each signature matrix is expected to be stored in 

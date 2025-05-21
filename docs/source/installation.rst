@@ -11,8 +11,8 @@ Prerequisites
 
 Choose one of the following options:
 
-Option A: Conda
----------------
+Option A: Conda (recommended)
+-----------------------------
 
 .. code-block:: bash
 

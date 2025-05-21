@@ -42,7 +42,7 @@ def zscores(mdata,
             thr=5, 
             out_key='zscores'):
     """
-    Compute z-scores for the top features in each topic within a MuData object.
+    Compute z-scores for feature signatures.
 
     This function calculates z-scores for the top features associated with each topic in the specified 
     modality or across all modalities of a `MuData` object. Z-scores are computed using normalized and 

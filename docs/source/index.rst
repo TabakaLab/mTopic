@@ -62,7 +62,8 @@ Features
    :hidden:
 
    installation
-   notebooks/T1_data_preprocessing
-   notebooks/T2_tonsils
-   notebooks/T3_pbmc
+   notebooks/T1_P22_Mouse_Brain_preprocessing
+   notebooks/T2_P22_Mouse_Brain_training
+   notebooks/T3_Human_Tonsil_training
+   notebooks/T4_Human_PBMC_training
    api
