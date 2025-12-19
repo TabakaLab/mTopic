@@ -1,12 +1,13 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
+import inspect
 
+sys.path.insert(0, os.path.abspath("../../"))
 
-project = 'mTopic'
-copyright = '2025, Piotr Rutkowski'
-author = 'Piotr Rutkowski'
-release = '1.0'
+project = "mTopic"
+copyright = "2025, Piotr Rutkowski"
+author = "Piotr Rutkowski"
+release = "1.0"
 
 extensions = [
     "recommonmark",
@@ -17,13 +18,12 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.mathjax",
     "nbsphinx",
-    "IPython.sphinxext.ipython_console_highlighting"
+    "IPython.sphinxext.ipython_console_highlighting",
 ]
 
 # autodoc/autosummary config
 autosummary_generate = True
 autosummary_imported_members = False
-
 
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
@@ -40,14 +40,13 @@ napoleon_preprocess_types = False
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
-templates_path = ['_templates']
-
+templates_path = ["_templates"]
 exclude_patterns = []
 
-html_theme = 'sphinx_book_theme'
+html_theme = "sphinx_book_theme"
 
 source_suffix = {
-    '.rst': 'restructuredtext',
+    ".rst": "restructuredtext",
 }
 
 html_logo = "_static/mTopic_logo_light.png"
@@ -57,61 +56,54 @@ html_theme_options = {
     "logo": {
         "image_light": "_static/mTopic_logo_light.png",
         "image_dark": "_static/mTopic_logo_dark.png",
-    }
+    },
 }
 
-
 html_static_path = ["_static"]
-
-html_extra_path = ['_static/mTopic_logo_dark.png', '_static/mTopic_logo_light.png']
-
-html_css_files = ['custom.css']
+html_extra_path = ["_static/mTopic_logo_dark.png", "_static/mTopic_logo_light.png"]
+html_css_files = ["custom.css"]
 
 from sphinx.ext.autosummary import Autosummary
-from sphinx.ext.autosummary import get_documenter
 from docutils.parsers.rst import directives
-from sphinx.util.inspect import safe_getattr
-import re
+
 
 class AutoAutoSummary(Autosummary):
-
-    option_spec = {
-        'methods': directives.unchanged,
-        'attributes': directives.unchanged
-    }
-
+    option_spec = {"methods": directives.unchanged, "attributes": directives.unchanged}
     required_arguments = 1
 
     @staticmethod
     def get_members(obj, typ, include_public=None):
-        if not include_public:
-            include_public = []
+        include_public = include_public or []
         items = []
-        for name in dir(obj):
-            try:
-                documenter = get_documenter(safe_getattr(obj, name), obj)
-            except AttributeError:
-                continue
-            if documenter.objtype == typ:
-                items.append(name)
-        public = [x for x in items if x in include_public or not x.startswith('_')]
+
+        for name, member in inspect.getmembers(obj):
+            if typ == "method":
+                if inspect.isroutine(member):  # functions, methods, builtins, descriptors
+                    items.append(name)
+            elif typ == "attribute":
+                if (not inspect.isroutine(member)) and (not inspect.isclass(member)) and (not inspect.ismodule(member)):
+                    items.append(name)
+
+        public = [x for x in items if x in include_public or not x.startswith("_")]
         return public, items
 
     def run(self):
         clazz = str(self.arguments[0])
         try:
-            (module_name, class_name) = clazz.rsplit('.', 1)
+            module_name, class_name = clazz.rsplit(".", 1)
             m = __import__(module_name, globals(), locals(), [class_name])
             c = getattr(m, class_name)
-            if 'methods' in self.options:
-                _, methods = self.get_members(c, 'method', ['__init__'])
 
-                self.content = ["~%s.%s" % (clazz, method) for method in methods if not method.startswith('_')]
-            if 'attributes' in self.options:
-                _, attribs = self.get_members(c, 'attribute')
-                self.content = ["~%s.%s" % (clazz, attrib) for attrib in attribs if not attrib.startswith('_')]
+            if "methods" in self.options:
+                _, methods = self.get_members(c, "method", ["__init__"])
+                self.content = [f"~{clazz}.{method}" for method in methods if not method.startswith("_")]
+
+            if "attributes" in self.options:
+                _, attribs = self.get_members(c, "attribute")
+                self.content = [f"~{clazz}.{attrib}" for attrib in attribs if not attrib.startswith("_")]
         finally:
-            return super(AutoAutoSummary, self).run()
+            return super().run()
+
 
 def setup(app):
-    app.add_directive('autoautosummary', AutoAutoSummary)
+    app.add_directive("autoautosummary", AutoAutoSummary)
