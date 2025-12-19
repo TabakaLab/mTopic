@@ -13,3 +13,4 @@ recommonmark
 sphinx-automodapi
 nbsphinx
 ipython
+sphinx-book-theme
