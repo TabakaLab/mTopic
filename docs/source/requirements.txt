@@ -11,3 +11,4 @@ muon==0.1.6
 torch==2.5.1
 recommonmark
 sphinx-automodapi
+nbsphinx
