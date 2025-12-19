@@ -6,7 +6,7 @@ mTopic – Multimodal Topic Modeling for Single-Cell Data
    :width: 800px
    :alt: mTopic logo
 
-mTopic is a scalable Python package for topic modeling on multimodal single-cell datasets. It supports spatial and non-spatial data, enabling integrated analysis across multiple molecular layers, such as RNA, ATAC, and protein expression.
+mTopic is a scalable Python package for topic modeling on multimodal single-cell datasets. It supports spatial and non-spatial data, enabling a joint analysis across multiple molecular layers, such as RNA, ATAC, and protein expression.
 
 By capturing shared patterns across modalities, mTopic helps reveal latent biological structures, regulatory programs, and spatial organization within complex tissues.
 
@@ -20,7 +20,7 @@ Resources
 Features
 --------
 
-- Supports multimodal data integration (RNA, ATAC, protein, histone modifications)
+- Supports simultaneous inference of multimodal molecular programs from any set of single-cell modalities
 - Handles spatial and non-spatial single-cell data
 - Implements scalable variational inference for efficient training
 - Allows per-modality preprocessing, signature detection, and z-score enrichment

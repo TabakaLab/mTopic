@@ -13,7 +13,7 @@ def scale_counts(mdata,
 
     This function normalizes the total sum of counts in the `.X` matrix of each modality within the provided `MuData` object. 
     Each modality's counts are scaled so that their total sum matches a specified target value (`counts_per_cell * n_obs`). 
-    This ensures consistency in total counts across different modalities, which is crucial for comparative and integrative 
+    This ensures consistency in total counts across different modalities, which is crucial for comparative
     analyses in single-cell multimodal datasets.
 
     :param mdata: 
