@@ -1,8 +1,8 @@
-import muon
+import muon as mu
 import anndata as ad
 
 
-muon.set_options(pull_on_update=False)
+mu.set_options(pull_on_update=False)
 
 
 def scale_counts(mdata,
@@ -18,7 +18,7 @@ def scale_counts(mdata,
 
     :param mdata: 
         A `MuData` object containing multiple modalities, each with an `.X` attribute representing counts data.
-    :type mdata: muon.MuData
+    :type mdata: mu.MuData
     :param counts_per_cell: 
         The target average counts per cell. The total sum of counts in each modality is scaled to 
         `counts_per_cell * n_obs`, where `n_obs` is the number of cells. Default is 10,000.
@@ -31,7 +31,7 @@ def scale_counts(mdata,
     :returns: 
         If `copy` is True, returns a new `MuData` object with scaled counts data. 
         If `copy` is False, returns None and applies scaling directly to the input `MuData` object.
-    :rtype: muon.MuData or None
+    :rtype: mu.MuData or None
 
     :example:
 
@@ -53,15 +53,12 @@ def scale_counts(mdata,
           different total counts, making comparisons challenging.
     """
 
-    assert isinstance(mdata, muon.MuData)
+    assert isinstance(mdata, mu.MuData)
     
     if copy:
         mdata = mdata.copy()
 
     for mod in mdata.mod:
-        if not isinstance(mdata.mod[mod].raw, ad._core.raw.Raw):
-            mdata.mod[mod].raw = mdata.mod[mod].copy()
-        
         mdata[mod].X = mdata[mod].X * (mdata.n_obs * counts_per_cell / mdata[mod].X.sum())
 
     if copy:
