@@ -73,4 +73,5 @@ Jupyter notebook kernel
 To create a Jupyter notebook kernel, run:
 
 .. code-block:: bash
+   
    python -m ipykernel install --user --name mtopic --display-name "Python (mTopic)"
