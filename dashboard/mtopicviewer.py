@@ -195,7 +195,11 @@ app.layout = dbc.Container([
                                             id='point-symbol',
                                             label='Marker shape',
                                             value='circle',
-                                            data=['circle', 'square'],
+                                            data=[
+                                                {'value': 'circle', 'label': 'circle'},
+                                                {'value': 'square', 'label': 'square'},
+                                                {'value': 'hexagon2', 'label': 'hexagon'}
+                                            ],
                                         ),
                                     )
                                 ], className='g-1'),
@@ -268,7 +272,7 @@ app.layout = dbc.Container([
                                 'plot_bgcolor': 'white',
                                 'paper_bgcolor': 'white',
                                 'annotations': [{
-                                    'text': 'Upload MTM data first',
+                                    'text': 'Upload mTopic data first',
                                     'xref': 'paper',
                                     'yref': 'paper',
                                     'x': 0.5,
@@ -509,7 +513,7 @@ def update_main_graph(topic, obs, coordinates, point_size, point_symbol, modalit
         global_store['df'] = df
     
     color_range_list = None
-    if len(df.columns) > 2 and df.dtypes[2] != 'category':
+    if len(df.columns) > 2 and df.dtypes.iloc[2] != 'category':
         min_is_correct = min_color is None or min_color == ''        
         color_min = df.iloc[:, 2].min() if min_is_correct else min_color
         
@@ -644,7 +648,7 @@ def topics_modal(button, coordinates, is_open):
         )
         num_topics = len(df_melted['Topic'].unique())
         cols = 5
-        rows = (num_topics + 3) // cols
+        rows = (num_topics + cols - 1) // cols
         fig, axes = plt.subplots(rows, cols, figsize=(20, 5*rows))
         axes = axes.ravel()
         for i, topic in enumerate(df_melted['Topic'].unique()):
@@ -655,9 +659,11 @@ def topics_modal(button, coordinates, is_open):
                 c=topic_data['value'],
                 cmap='inferno',
                 s=2
-            ) 
+            )
             axes[i].set_aspect('equal')
             axes[i].set_title(topic)
+        for ax in axes[num_topics:]:
+            ax.set_visible(False)
 
         buf = BytesIO()
         plt.savefig(buf, format="png", dpi=110, bbox_inches='tight')
