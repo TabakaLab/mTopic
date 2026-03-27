@@ -46,29 +46,21 @@ def _spatial_e_step(X,
                     radius, 
                     conv_threshold=0.0001):
     modalities = list(X.keys())
-    # number of documents
     D = X[modalities[0]].shape[0] 
-    # number of modalities
-    M = len(X)
-    # number of features 
     N = dict()
-    for m in modalities:
-        N[m] = X[m].shape[1]
-    # number of topicspr
+    for mod in modalities:
+        N[mod] = X[mod].shape[1]
     K = exp_E_log_beta[modalities[0]].shape[0]
-    # Initialize sufficient statistics
     new_lambda = dict()
-    for m in modalities:
-        new_lambda[m] = np.zeros((K, N[m]))
-    # Initialize normalizers
+    for mod in modalities:
+        new_lambda[mod] = np.zeros((K, N[mod]))
     phi_norm = dict()
-    for m in modalities:
-        phi_norm[m] = np.zeros(N[m])
-    # Initialize topic distributions
+    for mod in modalities:
+        phi_norm[mod] = np.zeros(N[mod])
+
     gamma = np.ones((D, K))
     sim = np.zeros((D, K))
 
-    # Find gamma for each document d
     for d in range(D):
         gamma_d = np.ones(K)
         exp_E_log_theta_d = _dirichlet_exp_E_log_prior(gamma_d)
@@ -76,24 +68,23 @@ def _spatial_e_step(X,
         idx_d = dict()
         counts_d = dict()
         exp_E_log_beta_d = dict()
-        for m in modalities:
-            idx_d[m] = X[m][d].nonzero()[1]
-            counts_d[m] = X[m][d][:, idx_d[m]].toarray().flatten()
-            exp_E_log_beta_d[m] = exp_E_log_beta[m][:, idx_d[m]]
+        for mod in modalities:
+            idx_d[mod] = X[mod][d].nonzero()[1]
+            counts_d[mod] = X[mod][d][:, idx_d[mod]].toarray().flatten()
+            exp_E_log_beta_d[mod] = exp_E_log_beta[mod][:, idx_d[mod]]
 
-        # Find topic distributions gamma
         for _ in range(max_iter_d):
             prev_gamma = gamma_d
 
-            for m in modalities:
-                phi_norm[m] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[m]) + 1e-100
-            # Gamma update
+            for mod in modalities:
+                phi_norm[mod] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[mod]) + 1e-100
+
             gamma_d = np.ones(K) * alpha
-            for m in modalities:
-                gamma_d += exp_E_log_theta_d * np.dot(counts_d[m] / phi_norm[m], exp_E_log_beta_d[m].T)
+            for mod in modalities:
+                gamma_d += exp_E_log_theta_d * np.dot(counts_d[mod] / phi_norm[mod], exp_E_log_beta_d[mod].T)
 
             exp_E_log_theta_d = _dirichlet_exp_E_log_prior(gamma_d)
-            # Check convergence
+
             meanchange = np.mean(abs(gamma_d - prev_gamma))
             if (meanchange < conv_threshold):
                 break
@@ -112,9 +103,9 @@ def _spatial_e_step(X,
         
         sim[d, :] = exp_E_log_sim
 
-        for m in modalities:
-            phi_norm[m] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[m]) + 1e-100
-            new_lambda[m][:, idx_d[m]] += np.outer(exp_E_log_theta_d, counts_d[m] / phi_norm[m])
+        for mod in modalities:
+            phi_norm[mod] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[mod]) + 1e-100
+            new_lambda[mod][:, idx_d[mod]] += np.outer(exp_E_log_theta_d, counts_d[mod] / phi_norm[mod])
 
     return gamma, new_lambda, sim
 
@@ -154,6 +145,9 @@ class sMTM():
     :param spatial_key: 
         Key in the `obsm` attribute of `MuData` specifying spatial coordinates. Default is 'coords'.
     :type spatial_key: str, optional
+    :param verbose: 
+        If True, displays a progress bar during training. Default is True.
+    :type verbose: bool, optional
     :param n_jobs: 
         Number of CPU cores to use for parallel computation. If set to -1, all available cores are used. Default is 10.
     :type n_jobs: int, optional
@@ -239,12 +233,14 @@ class sMTM():
                  cache_similarities=False, 
                  seed=2291, 
                  spatial_key='coords',
+                 verbose=True,
                  n_jobs=10):
         
         self.n_topics = n_topics
         self.radius = radius
         self.seed = seed
         self.rng = np.random.default_rng(seed=seed)
+        self.verbose = verbose
         self.n_jobs = n_jobs
 
         if self.n_jobs > cpu_count():
@@ -271,13 +267,12 @@ class sMTM():
         self.neighborhood_dist = distances
         self.neighborhood_graph = indices
 
-    def _load_data(self,
-                   X):
+    def _load_data(self, X):
         self.X = {mod: X[mod].X for mod in X.mod}
         self.modalities = list(self.X.keys())
         self.features = {mod: np.asarray(X[mod].var_names) for mod in X.mod}
         self.barcodes = X.obs.index.tolist()
-        self.D = self.X[self.modalities[0]].shape[0]
+        self.D = X.n_obs
         self.M = len(self.X)
         self.N = dict()
         for mod in self.modalities:
@@ -287,19 +282,15 @@ class sMTM():
         self.coords_scaled = (self.coords - np.min(self.coords, axis=0)) / np.max(np.max(self.coords, axis=0) - np.min(self.coords, axis=0))
     
     def _init_params(self):
-        # Topic prior
         self.eta = 0.01
-        # Topic distributions prior
         self.alpha = 1 / self.n_topics
-        # Initialize variational topic distributions
         self.gamma = np.ones((self.D, self.n_topics)) * self.alpha
-        # Initiate variational topics
         self.lambda_ = dict()
         self.exp_E_log_beta = dict()
 
-        for m in self.modalities:
-            self.lambda_[m] = self.rng.gamma(100., 1./100., (self.n_topics, self.N[m]))
-            self.exp_E_log_beta[m] = _dirichlet_exp_E_log_prior(self.lambda_[m])
+        for mod in self.modalities:
+            self.lambda_[mod] = self.rng.gamma(100., 1./100., (self.n_topics, self.N[mod]))
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
 
         if self.cache_similarities:
             self.similarities = dict()
@@ -321,7 +312,7 @@ class sMTM():
 
         output = Parallel(n_jobs=self.n_jobs)(
             delayed(_spatial_e_step)(
-                X = {m: self.X[m][batch_job] for m in self.modalities}, 
+                X = {mod: self.X[mod][batch_job] for mod in self.modalities}, 
                 alpha = self.alpha,
                 exp_E_log_beta = self.exp_E_log_beta,
                 max_iter_d = self.max_iter_d,
@@ -337,14 +328,15 @@ class sMTM():
             self.similarities[self.n_update] = np.vstack(sim_list)
         
         new_lambda = dict()
-        for m in self.modalities:
-            new_lambda[m] = np.zeros(self.lambda_[m].shape)
+        for mod in self.modalities:
+            new_lambda[mod] = np.zeros(self.lambda_[mod].shape)
             for lambda_update in new_lambda_list:
-                new_lambda[m] += lambda_update[m]
-            new_lambda[m] = self.eta + new_lambda[m] * self.exp_E_log_beta[m]
+                new_lambda[mod] += lambda_update[mod]
+            new_lambda[mod] = self.eta + new_lambda[mod] * self.exp_E_log_beta[mod]
 
-            self.lambda_[m] = new_lambda[m]
-            self.exp_E_log_beta[m] = _dirichlet_exp_E_log_prior(self.lambda_[m])
+            self.lambda_[mod] = new_lambda[mod]
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
+
 
     def VI(self, 
            n_iter = 20, 
@@ -356,6 +348,31 @@ class sMTM():
         batch = [i for i in range(self.D)]
 
         self.n_update = 1
-        for _ in tqdm(range(self.n_iter)):
+        for _ in tqdm(range(self.n_iter)) if self.verbose else range(self.n_iter):
             self._VI_update(batch)
             self.n_update += 1
+
+    def _predict_theta(self, var_lambda, max_iter_d=100):
+        self.max_iter_d = max_iter_d
+        self.lambda_ = var_lambda.copy()
+        for mod in self.modalities:
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
+
+        batch = [i for i in range(self.D)]
+
+        self._set_batch_n_jobs(batch)
+        batch_split = np.array_split(batch, self.n_jobs)
+
+        output = Parallel(n_jobs=self.n_jobs)(
+            delayed(_spatial_e_step)(
+                X = {mod: self.X[mod][batch_job] for mod in self.modalities}, 
+                alpha = self.alpha,
+                exp_E_log_beta = self.exp_E_log_beta,
+                max_iter_d = self.max_iter_d,
+                Gamma = self.gamma, 
+                Neigh = self.neighborhood_graph[batch_job], 
+                Dist = self.neighborhood_dist[batch_job],
+                radius = self.radius) for batch_job in batch_split)
+        
+        gamma_list, _, _ = zip(*output)
+        self.gamma = np.vstack(gamma_list)

@@ -3,8 +3,6 @@ from scipy.special import psi
 from tqdm import tqdm
 from multiprocessing import cpu_count
 from joblib import Parallel, delayed
-import os
-import pandas as pd
 
 
 def _dirichlet_exp_E_log_prior(prior):
@@ -19,29 +17,20 @@ def _e_step(X,
             exp_E_log_beta,
             max_iter_d, 
             conv_threshold=0.0001):
-    modalities = list(X.keys())
-    # number of documents
-    D = X[modalities[0]].shape[0] 
-    # number of modalities
-    M = len(X)
-    # number of features 
+    self.modalities = list(X.keys())
+    D = X[self.modalities[0]].shape[0] 
     N = dict()
-    for m in modalities:
-        N[m] = X[m].shape[1]
-    # number of topicspr
-    K = exp_E_log_beta[modalities[0]].shape[0]
-    # Initialize sufficient statistics
+    for mod in self.modalities:
+        N[mod] = X[mod].shape[1]
+    K = exp_E_log_beta[self.modalities[0]].shape[0]
     new_lambda = dict()
-    for m in modalities:
-        new_lambda[m] = np.zeros((K, N[m]))
-    # Initialize normalizers
+    for mod in self.modalities:
+        new_lambda[mod] = np.zeros((K, N[mod]))
     phi_norm = dict()
-    for m in modalities:
-        phi_norm[m] = np.zeros(N[m])
-    # Initialize topic distributions
+    for mod in self.modalities:
+        phi_norm[mod] = np.zeros(N[mod])
     gamma = np.ones((D, K))
 
-    # Find gamma for each document d
     for d in range(D):
         gamma_d = np.ones(K)
         exp_E_log_theta_d = _dirichlet_exp_E_log_prior(gamma_d)
@@ -49,34 +38,30 @@ def _e_step(X,
         idx_d = dict()
         counts_d = dict()
         exp_E_log_beta_d = dict()
-        for m in modalities:
-            idx_d[m] = X[m][d].nonzero()[1]
-            counts_d[m] = X[m][d][:, idx_d[m]].toarray().flatten()
-            exp_E_log_beta_d[m] = exp_E_log_beta[m][:, idx_d[m]]
+        for mod in self.modalities:
+            idx_d[mod] = X[mod][d].nonzero()[1]
+            counts_d[mod] = X[mod][d][:, idx_d[mod]].toarray().flatten()
+            exp_E_log_beta_d[mod] = exp_E_log_beta[mod][:, idx_d[mod]]
 
-        # Find topic distributions gamma
         for _ in range(max_iter_d):
             prev_gamma = gamma_d
 
-            for m in modalities:
-                phi_norm[m] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[m]) + 1e-100
-            # Gamma update
-            gamma_d = np.ones(K) * alpha
-            for m in modalities:
-                gamma_d += exp_E_log_theta_d * np.dot(counts_d[m] / phi_norm[m], exp_E_log_beta_d[m].T)
+            for mod in self.modalities:
+                phi_norm[mod] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[mod]) + 1e-100
 
+            gamma_d = np.ones(K) * alpha
+            for mod in modalities:
+                gamma_d += exp_E_log_theta_d * np.dot(counts_d[mod] / phi_norm[mod], exp_E_log_beta_d[mod].T)
             exp_E_log_theta_d = _dirichlet_exp_E_log_prior(gamma_d)
-            # Check convergence
+
             meanchange = np.mean(abs(gamma_d - prev_gamma))
             if (meanchange < conv_threshold):
                 break
-
-        # Save converged topic distributions
         gamma[d, :] = gamma_d
 
-        for m in modalities:
-            phi_norm[m] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[m]) + 1e-100
-            new_lambda[m][:, idx_d[m]] += np.outer(exp_E_log_theta_d, counts_d[m] / phi_norm[m])
+        for mod in self.modalities:
+            phi_norm[mod] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[mod]) + 1e-100
+            new_lambda[mod][:, idx_d[mod]] += np.outer(exp_E_log_theta_d, counts_d[mod] / phi_norm[mod])
 
     return gamma, new_lambda
 
@@ -102,6 +87,9 @@ class MTM:
     :param seed: 
         Random seed for reproducibility. Ensures consistent initialization and results. Default is 2291.
     :type seed: int, optional
+    :param verbose: 
+        If True, displays a progress bar during training. Default is True.
+    :type verbose: bool, optional
     :param n_jobs: 
         Number of CPU cores to use for parallel processing. If set to -1, uses all available cores. Default is 10.
     :type n_jobs: int, optional
@@ -222,11 +210,13 @@ class MTM:
     def __init__(self, 
                  mdata,
                  n_topics=20,
-                 seed=2291, 
+                 seed=2291,
+                 verbose=True, 
                  n_jobs=10):
         self.n_topics = n_topics
         self.seed = seed
         self.rng = np.random.default_rng(seed=seed)
+        self.verbose = verbose
         self.n_jobs = n_jobs
 
         if self.n_jobs > cpu_count():
@@ -254,9 +244,9 @@ class MTM:
         self.lambda_ = dict()
         self.exp_E_log_beta = dict()
 
-        for m in self.modalities:
-            self.lambda_[m] = self.rng.gamma(100., 1./100., (self.n_topics, self.n_var[m]))
-            self.exp_E_log_beta[m] = _dirichlet_exp_E_log_prior(self.lambda_[m])
+        for mod in self.modalities:
+            self.lambda_[mod] = self.rng.gamma(100., 1./100., (self.n_topics, self.n_var[mod]))
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
 
     def _set_batch_n_jobs(self,
                           batch):
@@ -275,7 +265,7 @@ class MTM:
 
         output = Parallel(n_jobs=self.n_jobs)(
             delayed(_e_step)(
-            {m: self.X[m][batch_job] for m in self.modalities}, 
+            {mod: self.X[mod][batch_job] for mod in self.modalities}, 
             self.alpha,
             self.exp_E_log_beta,
             self.max_iter_d) for batch_job in batch_split)
@@ -285,14 +275,14 @@ class MTM:
         self.gamma = np.vstack(gamma_list)
         
         new_lambda = dict()
-        for m in self.modalities:
-            new_lambda[m] = np.zeros(self.lambda_[m].shape)
+        for mod in self.modalities:
+            new_lambda[mod] = np.zeros(self.lambda_[mod].shape)
             for lambda_update in new_lambda_list:
-                new_lambda[m] += lambda_update[m]
-            new_lambda[m] = self.eta + new_lambda[m] * self.exp_E_log_beta[m]
+                new_lambda[mod] += lambda_update[mod]
+            new_lambda[mod] = self.eta + new_lambda[mod] * self.exp_E_log_beta[mod]
 
-            self.lambda_[m] = new_lambda[m]
-            self.exp_E_log_beta[m] = _dirichlet_exp_E_log_prior(self.lambda_[m])
+            self.lambda_[mod] = new_lambda[mod]
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
 
     def VI(self, 
            n_iter=20, 
@@ -304,9 +294,31 @@ class MTM:
         batch = [i for i in range(self.n_obs)]
 
         self.n_update = 1
-        for _ in tqdm(range(self.n_iter)):
+        for _ in tqdm(range(self.n_iter)) if self.verbose else range(self.n_iter):
             self._VI_update(batch)
             self.n_update += 1  
+
+    def _predict_theta(self, var_lambda, max_iter_d=100):
+        self.max_iter_d = max_iter_d
+        self.lambda_ = var_lambda.copy()
+        for mod in self.modalities:
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
+
+        batch = [i for i in range(self.n_obs)]
+
+        self._set_batch_n_jobs(batch)
+        batch_split = np.array_split(batch, self.n_jobs)
+
+        output = Parallel(n_jobs=self.n_jobs)(
+            delayed(_e_step)(
+            {mod: self.X[mod][batch_job] for mod in self.modalities}, 
+            self.alpha,
+            self.exp_E_log_beta,
+            self.max_iter_d) for batch_job in batch_split)
+        
+        gamma_list, _ = zip(*output)
+        self.gamma = np.vstack(gamma_list)
+
 
     def _SVI_update(self, 
                     batch):
@@ -315,7 +327,7 @@ class MTM:
 
         output = Parallel(n_jobs=self.n_jobs)(
             delayed(_e_step)(
-            {m: self.X[m][batch_job] for m in self.modalities}, 
+            {mod: self.X[mod][batch_job] for mod in self.modalities}, 
             self.alpha,
             self.exp_E_log_beta,
             self.max_iter_d) for batch_job in batch_split)
@@ -327,15 +339,15 @@ class MTM:
         rhot = pow(self.tau + self.n_update, -self.kappa)
 
         new_lambda = dict()
-        for m in self.modalities:
-            new_lambda[m] = np.zeros(self.lambda_[m].shape)
+        for mod in self.modalities:
+            new_lambda[mod] = np.zeros(self.lambda_[mod].shape)
             for lambda_update in new_lambda_list:
-                new_lambda[m] += lambda_update[m]
+                new_lambda[mod] += lambda_update[mod]
         
-            new_lambda[m] = self.eta + self.n_obs * new_lambda[m] * self.exp_E_log_beta[m] / self.batch_size
+            new_lambda[mod] = self.eta + self.n_obs * new_lambda[mod] * self.exp_E_log_beta[mod] / self.batch_size
 
-            self.lambda_[m] = (1 - rhot) * self.lambda_[m] + rhot * new_lambda[m]
-            self.exp_E_log_beta[m] = _dirichlet_exp_E_log_prior(self.lambda_[m])
+            self.lambda_[mod] = (1 - rhot) * self.lambda_[mod] + rhot * new_lambda[mod]
+            self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
         
     def SVI(self,
             n_batches=100,

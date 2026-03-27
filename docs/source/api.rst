@@ -24,6 +24,7 @@ Preprocessing (`pp`)
 .. autosummary::
    :toctree: generated
 
+   mtopic.pp.estimate_topic_number
    mtopic.pp.permute
    mtopic.pp.tfidf
    mtopic.pp.clr
@@ -44,13 +45,14 @@ Tools (`tl`)
    mtopic.tl.zscores
    mtopic.tl.umap
    mtopic.tl.feature_associations
-
+   
 Plotting (`pl`)
 ^^^^^^^^^^^^^^^
 
 .. autosummary::
    :toctree: generated
 
+   mtopic.pl.estimate_topic_number
    mtopic.pl.filter_var_knee
    mtopic.pl.filter_topics
    mtopic.pl.topics
@@ -60,3 +62,4 @@ Plotting (`pl`)
    mtopic.pl.zscores
    mtopic.pl.corr_heatmap
    mtopic.pl.feature_activity
+   
