@@ -17,17 +17,17 @@ def _e_step(X,
             exp_E_log_beta,
             max_iter_d, 
             conv_threshold=0.0001):
-    self.modalities = list(X.keys())
-    D = X[self.modalities[0]].shape[0] 
+    modalities = list(X.keys())
+    D = X[modalities[0]].shape[0] 
     N = dict()
-    for mod in self.modalities:
+    for mod in modalities:
         N[mod] = X[mod].shape[1]
-    K = exp_E_log_beta[self.modalities[0]].shape[0]
+    K = exp_E_log_beta[modalities[0]].shape[0]
     new_lambda = dict()
-    for mod in self.modalities:
+    for mod in modalities:
         new_lambda[mod] = np.zeros((K, N[mod]))
     phi_norm = dict()
-    for mod in self.modalities:
+    for mod in modalities:
         phi_norm[mod] = np.zeros(N[mod])
     gamma = np.ones((D, K))
 
@@ -38,7 +38,7 @@ def _e_step(X,
         idx_d = dict()
         counts_d = dict()
         exp_E_log_beta_d = dict()
-        for mod in self.modalities:
+        for mod in modalities:
             idx_d[mod] = X[mod][d].nonzero()[1]
             counts_d[mod] = X[mod][d][:, idx_d[mod]].toarray().flatten()
             exp_E_log_beta_d[mod] = exp_E_log_beta[mod][:, idx_d[mod]]
@@ -59,7 +59,7 @@ def _e_step(X,
                 break
         gamma[d, :] = gamma_d
 
-        for mod in self.modalities:
+        for mod in modalities:
             phi_norm[mod] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[mod]) + 1e-100
             new_lambda[mod][:, idx_d[mod]] += np.outer(exp_E_log_theta_d, counts_d[mod] / phi_norm[mod])
 

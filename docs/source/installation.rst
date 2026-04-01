@@ -39,7 +39,7 @@ You can check your NVIDIA driver and CUDA compatibility with:
 
    nvidia-smi
 
-Browse all available compute platforms (``cpu``, ``cu118``, ``cu121``, ``cu124``, ``cu126``, etc.) at `https://download.pytorch.org/whl/<https://download.pytorch.org/whl/>`_.
+Browse all available compute platforms (``cpu``, ``cu118``, ``cu121``, ``cu124``, ``cu126``, etc.) at `https://download.pytorch.org/whl/ <https://download.pytorch.org/whl/>`_.
 
 **CPU-only (no GPU)**
 
