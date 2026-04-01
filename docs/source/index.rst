@@ -62,9 +62,9 @@ Features
    :hidden:
 
    installation
-   notebooks/T0_Topic_Number_Selection
    notebooks/T1_P22_Mouse_Brain_preprocessing
    notebooks/T2_P22_Mouse_Brain_training
    notebooks/T3_Human_Tonsil_training
    notebooks/T4_Human_PBMC_training
+   notebooks/T5_Topic_Number_Selection
    api

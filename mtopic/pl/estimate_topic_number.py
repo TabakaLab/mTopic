@@ -116,7 +116,6 @@ def estimate_topic_number(
     ax.scatter(x, y_data, color="steelblue", s=25, zorder=5, label="Data (mean)")
     ax.plot(x_fit, y_fit, color="deeppink", linewidth=2, label=f"Rational fit  r²={r2:.3f}")
     ax.axvline(plateau_x, color="black", linestyle=":", linewidth=1.4, zorder=4)
-    ax.axvspan(plateau_x - 10, plateau_x + 10, alpha=0.12, color="black", zorder=3)
     ax.scatter([plateau_x], [plateau_y], color="black", s=60, zorder=6)
     ax.text(plateau_x + 1.5, plateau_y, f"K={best_K}", fontsize=9, va="center")
     ax.set_xlabel("Number of topics")
