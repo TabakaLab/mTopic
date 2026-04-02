@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mtopic",
-    version="1.0",
+    version="1.1",
     python_requires=">=3.9",
     install_requires=["numpy==1.26.1",
                       "scipy==1.11.3",

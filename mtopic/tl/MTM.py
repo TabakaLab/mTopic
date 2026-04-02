@@ -46,7 +46,7 @@ def _e_step(X,
         for _ in range(max_iter_d):
             prev_gamma = gamma_d
 
-            for mod in self.modalities:
+            for mod in modalities:
                 phi_norm[mod] = np.dot(exp_E_log_theta_d, exp_E_log_beta_d[mod]) + 1e-100
 
             gamma_d = np.ones(K) * alpha
