@@ -68,7 +68,7 @@ def _e_step(X,
 
 class MTM:
     """
-    Multimodal Topic Model (MTM) for single-cell data analysis.
+    Multimodal Topic Model.
 
     This class implements a Multimodal Topic Model (MTM) for analyzing single-cell data 
     across multiple modalities. It is designed to discover latent topics that capture 
@@ -155,7 +155,7 @@ class MTM:
                     # Perform Variational Inference
                     model.VI(n_iter=20)
 
-        .. method:: SVI(n_batches=100, batch_size=100, tau=1., kappa=0.75, max_iter_d=100)
+        .. method:: SVI(n_batches=100, batch_size=512, tau=1., kappa=0.75, max_iter_d=100)
             Perform Stochastic Variational Inference (SVI) for large-scale data.
 
             SVI divides the dataset into batches and uses stochastic updates to infer topics. This method 
@@ -163,7 +163,7 @@ class MTM:
 
             :param n_batches: Number of batches to divide the data into. Default is 100.
             :type n_batches: int, optional
-            :param batch_size: Number of samples per batch. Smaller batch sizes use less memory but result in noisier updates. Default is 100.
+            :param batch_size: Number of samples per batch. Smaller batch sizes use less memory but result in noisier updates. Default is 512.
             :type batch_size: int, optional
             :param tau: Initial learning rate for SVI. Default is 1.0.
             :type tau: float, optional
@@ -185,7 +185,7 @@ class MTM:
                     model = mtopic.tl.MTM(mdata, n_topics=20)
 
                     # Perform Stochastic Variational Inference
-                    model.SVI(n_batches=100, batch_size=100)
+                    model.SVI()
 
     :example:
 
@@ -203,7 +203,7 @@ class MTM:
             model.VI(n_iter=20)
 
             # Fit model using Stochastic Variational Inference
-            model.SVI(n_batches=100, batch_size=100)
+            model.SVI(n_batches=100, batch_size=512)
     """
 
 
@@ -351,7 +351,7 @@ class MTM:
         
     def SVI(self,
             n_batches=100,
-            batch_size=100,
+            batch_size=512,
             tau=1., 
             kappa=0.75, 
             max_iter_d=100):

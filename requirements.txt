@@ -9,10 +9,4 @@ kneed==0.8.5
 matplotlib
 muon
 torch
-recommonmark
-sphinx-automodapi
-nbsphinx
-ipython
-sphinx-book-theme
-ipykernel
 ipywidgets

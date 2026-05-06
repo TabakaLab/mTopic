@@ -7,7 +7,7 @@ from mtopic.pl.filter_topics import filter_topics
 from mtopic.pl.filter_var_knee import filter_var_knee
 from mtopic.pl.feature_activity import feature_activity
 from mtopic.pl.scatter_pie import scatter_pie
-from mtopic.pl.estimate_topic_number import estimate_topic_number
+from mtopic.pl.select_n_topics import select_n_topics
 
 
 __all__ = ["topics",
@@ -19,4 +19,4 @@ __all__ = ["topics",
            "filter_var_knee",
            "feature_activity",
            "scatter_pie", 
-           "estimate_topic_number"]
+           "select_n_topics"]

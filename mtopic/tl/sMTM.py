@@ -4,8 +4,6 @@ from tqdm import tqdm
 from multiprocessing import cpu_count
 from joblib import Parallel, delayed
 from sklearn.neighbors import NearestNeighbors
-import os
-import pandas as pd
 from scipy.stats import norm
 
 
@@ -112,7 +110,7 @@ def _spatial_e_step(X,
 
 class sMTM():
     """
-    Spatial Multimodal Topic Model (sMTM) for single-cell spatial data analysis.
+    Spatial Multimodal Topic Model.
 
     This class implements a Spatial Multimodal Topic Model (sMTM) designed for analyzing 
     single-cell spatial data across multiple modalities. The model captures spatial 
@@ -135,10 +133,6 @@ class sMTM():
         Number of neighbors to consider when constructing the spatial neighborhood graph. 
         Overrides `radius` if set. Default is None.
     :type n_neighbors: int, optional
-    :param cache_similarities: 
-        If True, caches spatial similarity information for each update during Variational Inference. 
-        Default is False.
-    :type cache_similarities: bool, optional
     :param seed: 
         Random seed for reproducibility. Ensures consistent initialization and results. Default is 2291.
     :type seed: int, optional
@@ -190,8 +184,6 @@ class sMTM():
     :vartype lambda_: dict
     :ivar exp_E_log_beta: Expected log topic distributions.
     :vartype exp_E_log_beta: dict
-    :ivar similarities: Cached spatial similarity information, if enabled.
-    :vartype similarities: dict
 
     :methods:
         .. method:: VI(n_iter=20, max_iter_d=100)
@@ -230,7 +222,6 @@ class sMTM():
                  n_topics=20,
                  radius=0.05, 
                  n_neighbors=None, 
-                 cache_similarities=False, 
                  seed=2291, 
                  spatial_key='coords',
                  verbose=True,
@@ -246,9 +237,8 @@ class sMTM():
         if self.n_jobs > cpu_count():
             self.n_jobs = cpu_count()
         
-        self.cache_similarities = cache_similarities
         self.spatial_key = spatial_key
-        self.n_neighbors = None
+        self.n_neighbors = n_neighbors
 
         self._load_data(mdata)
         self._build_neighborhood_graph()
@@ -292,9 +282,6 @@ class sMTM():
             self.lambda_[mod] = self.rng.gamma(100., 1./100., (self.n_topics, self.N[mod]))
             self.exp_E_log_beta[mod] = _dirichlet_exp_E_log_prior(self.lambda_[mod])
 
-        if self.cache_similarities:
-            self.similarities = dict()
-
     def _set_batch_n_jobs(self, 
                           batch):
         if self.n_jobs == -1:
@@ -324,8 +311,6 @@ class sMTM():
         gamma_list, new_lambda_list, sim_list = zip(*output)
 
         self.gamma = np.vstack(gamma_list)
-        if self.cache_similarities:
-            self.similarities[self.n_update] = np.vstack(sim_list)
         
         new_lambda = dict()
         for mod in self.modalities:

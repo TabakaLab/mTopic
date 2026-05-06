@@ -3,8 +3,8 @@ import numpy as np
 import scipy.sparse as sp
 import pandas as pd
 import warnings
-from . import tfidf, clr, scale_counts
-from ..tl import MTM, sMTM
+from ..pp import tfidf, clr, scale_counts
+from . import MTM, sMTM
 
 
 def _preprocess(mdata):
@@ -77,7 +77,7 @@ def _log_likelihood(X_test, theta, beta, eps=1e-12):
     return ll_total, ll_per_mod
 
 
-def estimate_topic_number(
+def select_n_topics(
     mdata,
     Ks=[5, 20, 40, 60, 80, 100],
     *,
@@ -99,8 +99,7 @@ def estimate_topic_number(
     summary rows (``CV == "total"``).
 
     Results are stored in ``mdata.uns["CV_results"]`` and fold assignments
-    in ``mdata.obs["CV_split"]``. Results are also written to
-    ``<output_prefix>.csv``.
+    in ``mdata.obs["CV_split"]``.
 
     :param mdata:
         Pre-loaded multimodal dataset with raw counts.

@@ -43,7 +43,7 @@ def _find_plateau(x_fit, y_fit, threshold_fraction):
     return x_fit[below[0]] if len(below) else x_fit[-1]
 
 
-def estimate_topic_number(
+def select_n_topics(
     mdata,
     *,
     plateau_threshold=0.05,
@@ -113,14 +113,14 @@ def estimate_topic_number(
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    ax.scatter(x, y_data, color="steelblue", s=25, zorder=5, label="Data (mean)")
-    ax.plot(x_fit, y_fit, color="deeppink", linewidth=2, label=f"Rational fit  r²={r2:.3f}")
+    ax.scatter(x, y_data, color="black", s=25, zorder=5, label="Data")
+    ax.plot(x_fit, y_fit, color="black", linewidth=2, label=f"Rational fit")
     ax.axvline(plateau_x, color="black", linestyle=":", linewidth=1.4, zorder=4)
-    ax.scatter([plateau_x], [plateau_y], color="black", s=60, zorder=6)
-    ax.text(plateau_x + 1.5, plateau_y, f"K={best_K}", fontsize=9, va="center")
+    ax.scatter([plateau_x], [plateau_y], color="white", s=100, zorder=6, edgecolor="black")
+    ax.text(plateau_x + 1.5, plateau_y - 0.1, f"K={best_K}", fontsize=9, va="center")
     ax.set_xlabel("Number of topics")
     ax.set_ylabel("Normalized log-likelihood")
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=8, frameon=False)
 
     fig.tight_layout()
     mdata.uns["CV_fit_info"] = {

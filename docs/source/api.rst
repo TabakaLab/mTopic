@@ -24,7 +24,6 @@ Preprocessing (`pp`)
 .. autosummary::
    :toctree: generated
 
-   mtopic.pp.estimate_topic_number
    mtopic.pp.permute
    mtopic.pp.tfidf
    mtopic.pp.clr
@@ -40,11 +39,14 @@ Tools (`tl`)
    :toctree: generated
 
    mtopic.tl.MTM
+   mtopic.tl.MTM_GPU
    mtopic.tl.sMTM
+   mtopic.tl.sMTM_GPU
    mtopic.tl.export_params
    mtopic.tl.zscores
    mtopic.tl.umap
    mtopic.tl.feature_associations
+   mtopic.tl.select_n_topics
    
 Plotting (`pl`)
 ^^^^^^^^^^^^^^^
@@ -52,7 +54,7 @@ Plotting (`pl`)
 .. autosummary::
    :toctree: generated
 
-   mtopic.pl.estimate_topic_number
+   mtopic.pl.select_n_topics
    mtopic.pl.filter_var_knee
    mtopic.pl.filter_topics
    mtopic.pl.topics

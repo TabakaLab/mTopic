@@ -4,13 +4,15 @@ import inspect
 
 sys.path.insert(0, os.path.abspath("../../"))
 
+# -- Project information -----------------------------------------------------
 project = "mTopic"
-copyright = "2025, Piotr Rutkowski"
+copyright = "2026, Piotr Rutkowski"
 author = "Piotr Rutkowski"
 release = "1.1"
 
+# -- General configuration ---------------------------------------------------
 extensions = [
-    "recommonmark",
+    "myst_parser",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx.ext.autodoc",
@@ -21,10 +23,28 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
 ]
 
-# autodoc/autosummary config
+templates_path = ["_templates"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "**.ipynb_checkpoints",
+]
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
+
+# -- Autodoc / autosummary ---------------------------------------------------
 autosummary_generate = True
 autosummary_imported_members = False
 
+# -- Autosectionlabel --------------------------------------------------------
+# Prefix labels with document name to avoid duplicate-label warnings
+autosectionlabel_prefix_document = True
+
+# -- Napoleon (Google/NumPy style docstrings) --------------------------------
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = False
@@ -40,16 +60,14 @@ napoleon_preprocess_types = False
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
-templates_path = ["_templates"]
-exclude_patterns = []
+# -- nbsphinx ----------------------------------------------------------------
+# "never": use stored notebook outputs (recommended for reproducible builds)
+# "auto":  execute notebooks without stored outputs
+# "always": always re-execute
+nbsphinx_execute = "never"
 
+# -- HTML output -------------------------------------------------------------
 html_theme = "sphinx_book_theme"
-
-source_suffix = {
-    ".rst": "restructuredtext",
-}
-
-html_logo = "_static/mTopic_logo_light.png"
 
 html_theme_options = {
     "navigation_depth": 4,
@@ -60,15 +78,21 @@ html_theme_options = {
 }
 
 html_static_path = ["_static"]
-html_extra_path = ["_static/mTopic_logo_dark.png", "_static/mTopic_logo_light.png"]
 html_css_files = ["custom.css"]
 
+
+# -- Custom directive: AutoAutoSummary ---------------------------------------
 from sphinx.ext.autosummary import Autosummary
 from docutils.parsers.rst import directives
 
 
 class AutoAutoSummary(Autosummary):
-    option_spec = {"methods": directives.unchanged, "attributes": directives.unchanged}
+    """Autosummary that automatically lists methods/attributes of a class."""
+
+    option_spec = {
+        "methods": directives.unchanged,
+        "attributes": directives.unchanged,
+    }
     required_arguments = 1
 
     @staticmethod
@@ -78,10 +102,14 @@ class AutoAutoSummary(Autosummary):
 
         for name, member in inspect.getmembers(obj):
             if typ == "method":
-                if inspect.isroutine(member):  # functions, methods, builtins, descriptors
+                if inspect.isroutine(member):
                     items.append(name)
             elif typ == "attribute":
-                if (not inspect.isroutine(member)) and (not inspect.isclass(member)) and (not inspect.ismodule(member)):
+                if (
+                    not inspect.isroutine(member)
+                    and not inspect.isclass(member)
+                    and not inspect.ismodule(member)
+                ):
                     items.append(name)
 
         public = [x for x in items if x in include_public or not x.startswith("_")]
@@ -96,11 +124,19 @@ class AutoAutoSummary(Autosummary):
 
             if "methods" in self.options:
                 _, methods = self.get_members(c, "method", ["__init__"])
-                self.content = [f"~{clazz}.{method}" for method in methods if not method.startswith("_")]
+                self.content = [
+                    f"~{clazz}.{method}"
+                    for method in methods
+                    if not method.startswith("_")
+                ]
 
             if "attributes" in self.options:
                 _, attribs = self.get_members(c, "attribute")
-                self.content = [f"~{clazz}.{attrib}" for attrib in attribs if not attrib.startswith("_")]
+                self.content = [
+                    f"~{clazz}.{attrib}"
+                    for attrib in attribs
+                    if not attrib.startswith("_")
+                ]
         finally:
             return super().run()
 
