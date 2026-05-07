@@ -94,7 +94,7 @@ def select_n_topics(
 
     For every combination of fold × K, cells are split into train / test subsets,
     the model is trained on the training set, lambda is transferred to predict
-    theta on the test set, and the Poisson log-likelihood is evaluated on raw
+    theta on the test set, and the multinomial log-likelihood is evaluated on raw
     test counts. Per-fold results are averaged across folds and appended as
     summary rows (``CV == "total"``).
 

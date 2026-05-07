@@ -35,7 +35,8 @@ def filter_var_knee(model,
         The modality to analyze (e.g., 'rna', 'protein').
     :type mod: str
     :param knee_sensitivities: 
-        List of sensitivities for the knee detection algorithm. Higher sensitivity values detect more subtle changes. 
+        List of sensitivities for the knee detection algorithm. 
+        Higher values make the algorithm more conservative in identifying overrepresented features. 
         Default is [1, 2, 5, 10].
     :type knee_sensitivities: list of int, optional
     :param s: 

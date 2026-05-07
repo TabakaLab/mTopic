@@ -15,9 +15,9 @@ def export_params(model,
     topics with probabilities below a specified threshold, which helps focus on meaningful patterns.
 
     :param model: 
-        An instance of `mtopic.tl.MTM` or `mtopic.tl.spatialMTM` containing the parameters (`gamma` and `lambda_`) 
+        An instance of `mtopic.tl.MTM` or `mtopic.tl.sMTM` containing the parameters (`gamma` and `lambda_`) 
         to be exported.
-    :type model: mtopic.tl.MTM or mtopic.tl.spatialMTM
+    :type model: mtopic.tl.MTM or mtopic.tl.sMTM
     :param mdata: 
         A `MuData` object to which the parameters will be exported.
     :type mdata: muon.MuData
@@ -62,7 +62,7 @@ def export_params(model,
             model.VI(n_iter=20)
 
             # Export model parameters to MuData object
-            mtopic.pp.export_params(model, mdata)
+            mtopic.tl.export_params(model, mdata)
 
             # Access exported parameters
             print(mdata.obsm['topics'])  # Topic-cell distributions
@@ -83,7 +83,7 @@ def export_params(model,
     if filter_topics:
         filtered_topics = gamma.loc[:, gamma.max() > filter_threshold].columns.tolist()
         gamma = gamma.loc[:, filtered_topics]
-        gamma.div(gamma.sum(axis=1), axis=0)
+        gamma = gamma.div(gamma.sum(axis=1), axis=0)
         
     else:
         filtered_topics = gamma.columns.tolist()
