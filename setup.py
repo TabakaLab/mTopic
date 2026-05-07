@@ -16,6 +16,8 @@ setup(
         "kneed==0.8.5",
         "muon",
         "torch",
+        "ipykernel",
+        "ipywidgets",
     ],
     extras_require={
         "notebooks": [
@@ -31,6 +33,7 @@ setup(
             "nbsphinx",
             "ipython",
             "ipykernel",
+            "sphinx_copybutton",
         ],
     },
     author="Piotr Rutkowski",

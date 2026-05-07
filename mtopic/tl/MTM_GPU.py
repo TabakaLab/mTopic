@@ -283,7 +283,6 @@ class MTM_GPU:
         self.features = dict()
         self.X_csr = dict()
         
-        print(f"Program will run in {self.device} mode.")
         self.verbose = verbose
         self._load_data(mdata)
         self._init_params()
@@ -399,7 +398,7 @@ class MTM_GPU:
     def VI(self, n_iter=20, max_iter_d=100, batch_size=2048):
         self.max_iter_d = max_iter_d
 
-        for _ in tqdm(range(n_iter), desc="VI (CUDA)") if self.verbose else range(n_iter):
+        for _ in tqdm(range(n_iter)) if self.verbose else range(n_iter):
             self._VI_update(batch_size)
 
         self.gamma = self.gamma.detach().cpu().numpy()

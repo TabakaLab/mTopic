@@ -10,3 +10,4 @@ matplotlib
 muon
 torch
 ipywidgets
+ipykernel

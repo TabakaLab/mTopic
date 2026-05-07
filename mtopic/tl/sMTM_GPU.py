@@ -271,7 +271,6 @@ class sMTM_GPU:
         self.n_neighbors = n_neighbors
         self.verbose = verbose
 
-        print(f"Program will run in {self.device} mode.")
         self._load_data(mdata)
         self._build_neighborhood_graph()
         self._init_params()
@@ -366,7 +365,7 @@ class sMTM_GPU:
         batch = torch.arange(self.n_obs, device=self.device)
         self.n_update = 1
         
-        for _ in tqdm(range(self.n_iter), desc="VI (CUDA)") if self.verbose else range(self.n_iter):
+        for _ in tqdm(range(self.n_iter)) if self.verbose else range(self.n_iter):
             self._VI_update(batch)
             self.n_update += 1
             
