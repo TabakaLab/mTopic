@@ -80,5 +80,5 @@ def savefig(save,
     """
 
     if isinstance(save, str):
-        plt.savefig(save, dpi=dpi, transparent=transparent)
+        plt.savefig(save, dpi=dpi, transparent=transparent, bbox_inches="tight")
         plt.close()
